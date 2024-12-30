@@ -1,0 +1,220 @@
+openapi: 3.0.0
+info:
+  title: Uploader API
+  description: |-
+    This is a simple API to retrieve presigned S3 URLs for uploading content.
+    Users are required to have a valid short-term code to access the system.
+  contact:
+    email: adam@stepinto.io
+  version: 0.1.0
+paths:
+  /is-authorized:
+    get:
+      description: |-
+        Mock endpoint that sits behind a custom authorizer. Since any call which passes the authorizer is by definition
+        authorized, this only ever returns a 200 response
+      operationId: getIsAuthorized
+      responses:
+        "200":
+          description: Enable CORS support
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content: {}
+      security:
+        - ShortCodeAuthorizer: []
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200,"isAuthorized":true}'
+        passthroughBehavior: "never"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'*'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+  /signed-url/{filename}:
+    options:
+      parameters:
+        - in: path
+          name: filename
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Enable CORS support
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content: {}
+      security: []
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: "never"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'*'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+    get:
+      description: Retrieve pre-signed S3 URL to upload a map image
+      operationId: getSignedUrl
+      parameters:
+        - in: path
+          name: filename
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaveImageUrl"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+      security:
+        - ShortCodeAuthorizer: []
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+        responseParameters:
+          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization'"
+          method.response.header.Access-Control-Allow-Methods: "'*'"
+          method.response.header.Access-Control-Allow-Origin: "'*'"
+  /list-uploaded-items:
+    get:
+      description: Retrieve pre-signed S3 URL to upload a map image
+      operationId: getListUploadedItems
+      responses:
+        "200":
+          description: Successful operation
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Methods:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadedItems"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+      security:
+        - ShortCodeAuthorizer: []
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{handler}}/invocations
+        httpMethod: POST
+        responseParameters:
+          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization'"
+          method.response.header.Access-Control-Allow-Methods: "'*'"
+          method.response.header.Access-Control-Allow-Origin: "'*'"
+
+components:
+  schemas:
+    ShortCodeData:
+      type: object
+      required:
+        - shortcode
+      properties:
+        shortcode:
+          type: string
+        id:
+          type: string
+        active:
+          type: boolean
+        startTime:
+          type: string
+        endTime:
+          type: string
+    SaveImageUrl:
+      type: object
+      required:
+        - userId
+        - filename
+        - url
+      properties:
+        userId:
+          type: string
+        filename:
+          type: string
+        url:
+          type: string
+    UploadedItem:
+      type: object
+      required:
+        - key
+        - lastModified
+      properties:
+        key:
+          type: string
+        lastModified:
+          type: string
+    UploadedItems:
+      type: array
+      items:
+        $ref: "#/components/schemas/UploadedItem"
+    ApiResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        message:
+          type: string
+  securityDefinitions:
+    ShortCodeAuthorizer:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: custom
+      x-amazon-apigateway-authorizer:
+        type: token
+        authorizerResultTtlInSeconds: 60
+        authorizerUri: arn:aws:apigateway:{{region}}:lambda:path/2015-03-31/functions/{{authorizer}}/invocations

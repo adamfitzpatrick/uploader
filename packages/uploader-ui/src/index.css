@@ -1,0 +1,19 @@
+:root {
+  --background: rgb(0, 0, 0);
+  --foreground: rgb(255, 255, 255);
+  --text-light: rgb(255, 255, 255);
+
+  --border-radius: 5px;
+  --border-radius-lg: 6px;
+  --border-radius-sm: 4px;
+}
+
+body {
+  margin: 0;
+  font-family: "Fira Code", -apple-system, BlinkMacSystemFont;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background);
+  color: var(--text-light);
+}
+

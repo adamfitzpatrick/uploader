@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "rootDir": "."
+  },
+  "include": [
+    "lib/**/*",
+    "infra/**/*"
+  ],
+  "exclude": [
+    "**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "./lib/authorizer"
+    },
+    {
+      "path": "./lib/api-handler"
+    }
+  ]
+}

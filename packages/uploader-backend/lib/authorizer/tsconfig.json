@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/authorizer",
+    "rootDir": "..",
+    "noEmit": false
+  },
+  "include": [
+    "../**/*"
+  ],
+  "exclude": [
+    "../api-handler/**/*"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+    "folders": [
+        {
+            "name": "uploader",
+            "path": "."
+        },
+        {
+            "name": "uploader-ui",
+            "path": "./packages/uploader-ui"
+        },
+        {
+            "name": "uploader-backend",
+            "path": "./packages/uploader-backend"
+        }
+    ],
+    "settings": {
+        "search.exclude": {
+            "**/.yarn": true,
+            "**/.pnp.*": true
+        },
+        "typescript.tsdk": "uploader/.yarn/sdks/typescript/lib",
+        "typescript.enablePromptUseWorkspaceTsdk": true,
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "**/*.d.ts": true,
+            "**/*.js": true,
+            ".yarn": true
+        },
+        "markdown-preview-github-styles.colorTheme": "light",
+        "jest.disabledWorkspaceFolders": [
+            "uploader"
+        ],
+        "jest.runMode": "on-save",
+        "emmet.showExpandedAbbreviation": "never",
+        "editor.formatOnSave": true
+    },
+    "extensions": {
+        "recommendations": [
+            "arcanis.vscode-zipfs",
+            "hediet.vscode-drawio",
+            "bierner.markdown-preview-github-styles"
+        ]
+    }
+}
